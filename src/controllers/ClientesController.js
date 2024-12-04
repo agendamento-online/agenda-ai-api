@@ -6,9 +6,7 @@ class ClientesController {
       const novoCliente = req.body;
 
       if (!novoCliente.nome || !novoCliente.veiculo) {
-        resp
-          .status(400)
-          .send("Os campos nome, veículo são obrigatórios.");
+        resp.status(400).send("Os campos nome, veículo são obrigatórios.");
         return;
       }
 
@@ -26,7 +24,7 @@ class ClientesController {
       resp.send(resultado);
     } catch (error) {
       if (error.code === "ER_DUP_ENTRY") {
-        resp.status(400).send("Email já cadastrado.");
+        resp.status(400).send("Placa e/ou telefone já cadastrado.");
         return;
       }
       resp.status(500).send(error);
@@ -43,55 +41,50 @@ class ClientesController {
 
       const filtro = req.query.filtro || "";
       const [resultado] = await conexao.execute(comandoSql, [`%${filtro}%`]);
-      resp.send(
-        resultado.map((u) => {
-          delete u.senha;
-          return u;
-        })
-      );
+      resp.send(resultado);
     } catch (error) {
       resp.status(500).send(error);
     }
   }
 
-//   async atualizar(req, resp) {
-//     try {
-//       const usuarioEditar = req.body;
+  //   async atualizar(req, resp) {
+  //     try {
+  //       const usuarioEditar = req.body;
 
-//       if (!usuarioEditar.id || !usuarioEditar.nome || !usuarioEditar.email) {
-//         resp.status(400).send("Os campos id, nome e email são obrigatórios.");
-//         return;
-//       }
+  //       if (!usuarioEditar.id || !usuarioEditar.nome || !usuarioEditar.email) {
+  //         resp.status(400).send("Os campos id, nome e email são obrigatórios.");
+  //         return;
+  //       }
 
-//       const conexao = await new ConexaoMySql().getConexao();
-//       const comandoSql =
-//         "UPDATE usuarios SET nome = ?, email = ?, foto = ? WHERE id = ?";
+  //       const conexao = await new ConexaoMySql().getConexao();
+  //       const comandoSql =
+  //         "UPDATE usuarios SET nome = ?, email = ?, foto = ? WHERE id = ?";
 
-//       const [resultado] = await conexao.execute(comandoSql, [
-//         usuarioEditar.nome,
-//         usuarioEditar.email,
-//         usuarioEditar.foto || null,
-//         usuarioEditar.id,
-//       ]);
+  //       const [resultado] = await conexao.execute(comandoSql, [
+  //         usuarioEditar.nome,
+  //         usuarioEditar.email,
+  //         usuarioEditar.foto || null,
+  //         usuarioEditar.id,
+  //       ]);
 
-//       resp.send(resultado);
-//     } catch (error) {
-//       resp.status(500).send(error);
-//     }
-//   }
+  //       resp.send(resultado);
+  //     } catch (error) {
+  //       resp.status(500).send(error);
+  //     }
+  //   }
 
-//   async excluir(req, resp) {
-//     try {
-//       const conexao = await new ConexaoMySql().getConexao();
+  //   async excluir(req, resp) {
+  //     try {
+  //       const conexao = await new ConexaoMySql().getConexao();
 
-//       const comandoSql = "DELETE FROM usuarios WHERE id = ?";
-//       const [resultado] = await conexao.execute(comandoSql, [+req.params.id]);
+  //       const comandoSql = "DELETE FROM usuarios WHERE id = ?";
+  //       const [resultado] = await conexao.execute(comandoSql, [+req.params.id]);
 
-//       resp.send(resultado);
-//     } catch (error) {
-//       resp.status(500).send(error);
-//     }
-//   }
+  //       resp.send(resultado);
+  //     } catch (error) {
+  //       resp.status(500).send(error);
+  //     }
+  //   }
 }
 
 export default ClientesController;
