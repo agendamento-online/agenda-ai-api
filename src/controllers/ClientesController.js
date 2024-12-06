@@ -12,13 +12,13 @@ class ClientesController {
 
       const conexao = await new ConexaoMySql().getConexao();
       const comandoSql =
-        "INSERT INTO clientes (nome_cliente, telefone, veiculo, placa_veiculo) VALUES (?, ?, ?, ?)";
+        "INSERT INTO clientes (nome, telefone, veiculo, placa) VALUES (?, ?, ?, ?)";
 
       const [resultado] = await conexao.execute(comandoSql, [
         novoCliente.nome,
         novoCliente.telefone,
         novoCliente.veiculo,
-        novoCliente.placa_veiculo,
+        novoCliente.placa,
       ]);
 
       resp.send(resultado);
