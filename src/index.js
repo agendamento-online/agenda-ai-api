@@ -17,6 +17,7 @@ app.post("/login", _autenticacaoController.login);
 app.post("/usuarios", _usuariosController.adicionar);
 
 // Midleware de verificação de usuário logado
+
 app.use((req, resp, next) => {
   const usuarioLogado = req.headers["x-usuario"];
   if (!usuarioLogado) {
@@ -29,9 +30,10 @@ app.use((req, resp, next) => {
 // rotas privadas
 
 app.get("/clientes", _clientesController.listar);
+app.get("/clientes/:id", _clientesController.buscarPorId);
 app.post("/clientes", _clientesController.adicionar);
-// app.put("/clientes", _clientesController.atualizar);
-// app.delete("/clientes/:id", _clientesController.excluir);
+app.put("/clientes", _clientesController.atualizar);
+app.delete("/clientes/:id", _clientesController.excluir);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

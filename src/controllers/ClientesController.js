@@ -47,44 +47,62 @@ class ClientesController {
     }
   }
 
-  //   async atualizar(req, resp) {
-  //     try {
-  //       const usuarioEditar = req.body;
+  async buscarPorId(req, resp) {
+    try {
+      const conexao = await new ConexaoMySql().getConexao();
+      const comandoSql = "SELECT * FROM clientes WHERE id_cliente = ?";
 
-  //       if (!usuarioEditar.id || !usuarioEditar.nome || !usuarioEditar.email) {
-  //         resp.status(400).send("Os campos id, nome e email são obrigatórios.");
-  //         return;
-  //       }
+      const [resultado] = await conexao.execute(comandoSql, [+req.params.id]);
+      resp.send(resultado[0]);
+    } catch (error) {
+      resp.status(500).send(error);
+    }
+  }
 
-  //       const conexao = await new ConexaoMySql().getConexao();
-  //       const comandoSql =
-  //         "UPDATE usuarios SET nome = ?, email = ?, foto = ? WHERE id = ?";
+  async atualizar(req, resp) {
+    try {
+      const clienteEditar = req.body;
 
-  //       const [resultado] = await conexao.execute(comandoSql, [
-  //         usuarioEditar.nome,
-  //         usuarioEditar.email,
-  //         usuarioEditar.foto || null,
-  //         usuarioEditar.id,
-  //       ]);
+      if (!clienteEditar.id_cliente || !clienteEditar.nome || !clienteEditar.veiculo) {
+        resp.status(400).send("Os campos id, nome e veículo são obrigatórios.");
+        return;
+      }
 
-  //       resp.send(resultado);
-  //     } catch (error) {
-  //       resp.status(500).send(error);
-  //     }
-  //   }
+      const conexao = await new ConexaoMySql().getConexao();
+      const comandoSql =
+        "UPDATE clientes SET nome = ?, telefone = ?, veiculo = ?, placa = ? WHERE id_cliente = ?";
 
-  //   async excluir(req, resp) {
-  //     try {
-  //       const conexao = await new ConexaoMySql().getConexao();
+      const [resultado] = await conexao.execute(comandoSql, [
+        clienteEditar.nome,
+        clienteEditar.telefone,
+        clienteEditar.veiculo,
+        clienteEditar.placa,
+        +clienteEditar.id_cliente,
+      ]);
 
-  //       const comandoSql = "DELETE FROM usuarios WHERE id = ?";
-  //       const [resultado] = await conexao.execute(comandoSql, [+req.params.id]);
+      resp.send(resultado);
+    } catch (error) {
+      resp.status(500).send(error);
+    }
+  }
 
-  //       resp.send(resultado);
-  //     } catch (error) {
-  //       resp.status(500).send(error);
-  //     }
-  //   }
+    async excluir(req, resp) {
+      try {
+        const conexao = await new ConexaoMySql().getConexao();
+
+        const comandoSqlDelete = "DELETE FROM clientes WHERE id_cliente = ?";
+        await conexao.execute(comandoSqlDelete, [+req.params.id]);
+
+
+        const comandoSqlConsulta = "SELECT * FROM clientes"
+        const [resultadoConsulta] = await conexao.execute(comandoSqlConsulta)
+
+
+        resp.send(resultadoConsulta);
+      } catch (error) {
+        resp.status(500).send(error);
+      }
+    }
 }
 
 export default ClientesController;
