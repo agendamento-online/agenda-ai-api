@@ -4,11 +4,12 @@ class AgendamentoController {
   async adicionar(req, resp) {
     try {
       const novoAgendamento = req.body;
-
+        console.log(novoAgendamento);
+        
       if (
         !novoAgendamento.clienteSelecionado ||
         !novoAgendamento.data ||
-        !novoAgendamento.tempo ||
+        !novoAgendamento.horario ||
         !novoAgendamento.servico
       ) {
         resp.status(400).send("Todos os campos são obrigatórios!");
@@ -21,9 +22,9 @@ class AgendamentoController {
 
       const [resultado] = await conexao.execute(comandoSql, [
         novoAgendamento.data,
-        novoAgendamento.tempo,
+        novoAgendamento.horario,
         novoAgendamento.servico,
-        novoAgendamento.clienteSelecionado,
+        +novoAgendamento.clienteSelecionado,
       ]);
       resp.send(resultado);
     } catch (error) {
@@ -42,10 +43,9 @@ class AgendamentoController {
 
       const conexao = await new ConexaoMySql().getConexao();
       const comandoSql =
-        "SELECT * FROM agendamento WHERE id_agendamento LIKE ?";
+        "SELECT * FROM agendamento JOIN clientes ON clientes.id_cliente = agendamento.cliente_id AND agendamento.concluido = 0";
 
-      const filtro = req.query.filtro || "";
-      const [resultado] = await conexao.execute(comandoSql, [`%${filtro}%`]);
+      const [resultado] = await conexao.execute(comandoSql);
       resp.send(resultado);
     } catch (error) {
       resp.status(500).send(error);
@@ -68,7 +68,7 @@ class AgendamentoController {
     try {
       const agendamentoEditar = req.body;
 
-      if(!agendamentoEditar.data_servico || !agendamentoEditar.horario || !agendamentoEditar.servico){
+      if(!agendamentoEditar.data || !agendamentoEditar.horario || !agendamentoEditar.servico){
         resp.status(400).send("Todos os campos são obrigatórios.");
         return;
       }
@@ -77,7 +77,7 @@ class AgendamentoController {
       const comandoSql = "UPDATE agendamento SET data_servico = ?, horario = ?, servico = ? WHERE id_agendamento = ?";
 
       const [resultado] = await conexao.execute(comandoSql, [
-        agendamentoEditar.data_servico,
+        agendamentoEditar.data,
         agendamentoEditar.horario,
         agendamentoEditar.servico,
         +agendamentoEditar.id_agendamento,
@@ -93,11 +93,11 @@ class AgendamentoController {
     try {
       const conexao = await new ConexaoMySql().getConexao();
 
-      const comandoSqlDelete = "DELETE FROM agendamento WHERE id_agendamento = ?";
+      const comandoSqlDelete = "UPDATE agendamento SET concluido = 1 WHERE id_agendamento = ?";
       await conexao.execute(comandoSqlDelete, [+req.params.id]);
 
 
-      const comandoSqlConsulta = "SELECT * FROM agendamento"
+      const comandoSqlConsulta = "SELECT * FROM agendamento WHERE concluido = 0"
       const [resultadoConsulta] = await conexao.execute(comandoSqlConsulta)
 
 
